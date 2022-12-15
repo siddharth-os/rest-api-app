@@ -1,6 +1,7 @@
 const express=require('express');
 const mongoose=require('mongoose');
 const bodyParser=require('body-parser');
+const e = require('express');
 const app=express();
 
 app.use(bodyParser.urlencoded({extended:true}));
@@ -16,9 +17,25 @@ const infoSchema=mongoose.Schema({
 });
 const Article = mongoose.model("article",infoSchema);
 
+// app.route("/articles")
+// .get((req,res)=>{
+//         Article.find((err,results)=>{
+//             console.log(results);
+// })
+
 app.get("/articles",(req,res)=>{
     Article.find((err,results)=>{
         console.log(results);
+    });
+});
+//display specific article
+app.get("/articles/:title",(req,res)=>{
+    Article.findOne({title:req.params.title},(err,result)=>{
+        if(err)
+            console.log(err);
+        else{
+            console.log(result);
+        }
     });
 });
 app.post("/articles",(req,res)=>{
@@ -47,6 +64,41 @@ app.delete("/articles",(req,res)=>{
         }
     });
 });
-app.listen("3000",()=>{
-    console.log("Server is Listening at 3000.");
+app.put("/articles/:title",(req,res)=>{
+    Article.updateOne({title:req.params.title},{
+        title:req.body.title,
+        content:req.body.content
+    },(err,result)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log("Updated Successfully.");
+        }
+    });
+});
+app.patch("/articles/:title",(req,res)=>{
+    Article.updateOne({title:req.params.title},{
+        $set:req.body
+    },(err)=>{
+        if(err)
+            console.log(err);
+        else{
+            console.log("Updated/patched Successfully.");
+        }
+    })
+});
+app.delete("/articles/:title",(req,res)=>{
+    Article.deleteOne({title:req.params.title},(err)=>{
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log("Deleted article successfully.");
+        }
+    });
+});
+
+app.listen(3000,()=>{
+    console.log("Server is Active.");
 });
